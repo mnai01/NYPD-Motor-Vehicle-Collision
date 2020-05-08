@@ -182,7 +182,7 @@ sub CollisionByFactorVH2 {
     my @cells;
     my @colvalues;
     # Hash table
-    my %wordcount = ();
+    my %collisionVH2Table = ();
 
     # represents the first row of the file
     my $header = <IN>;
@@ -217,13 +217,13 @@ sub CollisionByFactorVH2 {
         chomp $ContributingFactor;
         # removed records that say "Unspecified" or are blank
         if($ContributingFactor ne "Unspecified" && $ContributingFactor ne ""){
-            $wordCount{$ContributingFactor} += 1;
+            $collisionVH2Table{$ContributingFactor} += 1;
         }
     }
 
     # display the key and the value associated with that key
-    foreach my $key(sort{ $wordCount{$b} <=> $wordCount{$a} } keys %wordCount){
-        print "CONTRIBUTING FACTOR VEHICLE 2: $key, Collision Count: " . $wordCount{$key} . "\n";
+    foreach my $key(sort{ $collisionVH2Table{$b} <=> $collisionVH2Table{$a} } keys %collisionVH2Table){
+        print "CONTRIBUTING FACTOR VEHICLE 2: $key, Collision Count: " . $collisionVH2Table{$key} . "\n";
     }
 
     my $sizeofarray = scalar @colvalues;
@@ -239,7 +239,7 @@ sub CollisionByZip {
     my @cells;
     my @colvalues;
     # Hash table
-    my %collisionVH2Table = ();
+    my %zipCodeTable = ();
 
     # represents the first row of the file
     my $header = <IN>;
@@ -274,13 +274,13 @@ sub CollisionByZip {
         chomp $zipCode;
         # removed records that say "Unspecified" or are blank
         if($zipCode ne "Unspecified" && $zipCode ne ""){
-            $collisionVH2Table{$zipCode} += 1;
+            $zipCodeTable{$zipCode} += 1;
         }
     }
 
     # display the key and the value associated with that key
-    foreach my $key(sort{ $collisionVH2Table{$b} <=> $collisionVH2Table{$a} } keys %collisionVH2Table){
-        print "Zip Code: $key, Collision Count: " . $collisionVH2Table{$key} . "\n";
+    foreach my $key(sort{ $zipCodeTable{$b} <=> $zipCodeTable{$a} } keys %zipCodeTable){
+        print "Zip Code: $key, Collision Count: " . $zipCodeTable{$key} . "\n";
     }
 
     my $sizeofarray = scalar @colvalues;
@@ -359,7 +359,308 @@ sub CollisionBySeason {
     print "$sizeofarray Records Matches\n";
 }
 
-sub subroutines12 {
+sub LowestCollisionFactorMonth("NOT DONE") {
+    open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
+    my $wanted_column = "CONTRIBUTING FACTOR VEHICLE 2";
+    my $rowLength;
+    # array
+    my @cells;
+    my @colvalues;
+    # Hash table
+    my %wordcount = ();
+
+    # represents the first row of the file
+    my $header = <IN>;
+    # splits each column in header and stores it in an array
+    my @column_names = split( ",", $header );
+    my $extract_col = 0;
+
+    # iterates through column_names and matches the wanted column
+    # once found, store the index so we can use it to take extract the specific 
+    # cell data we want from each row
+    for my $header_line (@column_names) {
+        # last if is like break in c++
+        # once condition is met, break out, else increment extract_col
+        last if $header_line =~ m/$wanted_column/;
+        $extract_col++;
+    }
+
+    # iterates between rows
+    while ( my $row = <IN> ) {
+        # last unless $row =~ /\S/;
+        # chomp $row;
+        @cells = split( ",", $row );
+        # print($row."\n");
+        # print(@cells."\n");
+        my ($yyyy, $mm, $dd) = split('-', $cells[$extract_col]);
+        push( @colvalues, $cells[$extract_col]);
+        $rowLength++;
+    }
+
+
+    # this will ether increment an already existing key-value with +1
+    # or it will insert a new key-value pair into the hash making it set to 1
+    foreach my $ContributingFactor(@colvalues) {
+        chomp $ContributingFactor;
+        # removed records that say "Unspecified" or are blank
+        if($ContributingFactor ne "Unspecified" && $ContributingFactor ne ""){
+            $wordCount{$ContributingFactor} += 1;
+        }
+    }
+
+    # display the key and the value associated with that key
+    foreach my $key(sort{ $wordCount{$b} <=> $wordCount{$a} } keys %wordCount){
+        print "CONTRIBUTING FACTOR VEHICLE 2: $key, Collision Count: " . $wordCount{$key} . "\n";
+    }
+
+    my $sizeofarray = scalar @colvalues;
+    print "$rowLength Records Scanned\n";
+    print "$sizeofarray Records Matches\n";
+}
+
+sub LowestCollisionYear {
+    open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
+    my $wanted_column = "ACCIDENT DATE";
+    my $rowLength;
+    # array
+    my @cells;
+    my @colvalues;
+    # Hash table
+    my %lowestYearTable = ();
+
+    # represents the first row of the file
+    my $header = <IN>;
+    # splits each column in header and stores it in an array
+    my @column_names = split( ",", $header );
+    my $extract_col = 0;
+
+    # iterates through column_names and matches the wanted column
+    # once found, store the index so we can use it to take extract the specific 
+    # cell data we want from each row
+    for my $header_line (@column_names) {
+        # last if is like break in c++
+        # once condition is met, break out, else increment extract_col
+        last if $header_line =~ m/$wanted_column/;
+        $extract_col++;
+    }
+
+    # iterates between rows
+    while ( my $row = <IN> ) {
+        # last unless $row =~ /\S/;
+        # chomp $row;
+        @cells = split( ",", $row );
+        # print($row."\n");
+        # print(@cells."\n");
+        my ($yyyy, $mm, $dd) = split('-', $cells[$extract_col]);
+        push( @colvalues, $yyyy);
+        $rowLength++;
+    }
+
+    # this will ether increment an already existing key-value with +1
+    # or it will insert a new key-value pair into the hash making it set to 1
+    foreach my $years(@colvalues) {
+        $lowestYearTable{$years} += 1;
+    }
+    my $lowMarker = 100000000000;
+    my $lowKey = 0;
+    # display the key and the value associated with that key
+    foreach my $key(sort{ $lowestYearTable{$b} <=> $lowestYearTable{$a} } keys %lowestYearTable){
+        if($lowMarker > $lowestYearTable{$key}){
+            $lowMarker = $lowestYearTable{$key};
+            $lowKey = $key
+        }
+    }
+    print "LOWEST Year: $lowKey, Collision Count: " . $lowestYearTable{$lowKey} . "\n";
+
+    my $sizeofarray = scalar @colvalues;
+    print "$rowLength Records Scanned\n";
+    print "$sizeofarray Records Matches\n";
+}
+
+sub LowestCollisionMonth {
+    open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
+    my $wanted_column = "ACCIDENT DATE";
+    my $rowLength;
+    # array
+    my @cells;
+    my @colvalues;
+    # Hash table
+    my %lowestMonthTable = ();
+
+    # represents the first row of the file
+    my $header = <IN>;
+    # splits each column in header and stores it in an array
+    my @column_names = split( ",", $header );
+    my $extract_col = 0;
+
+    # iterates through column_names and matches the wanted column
+    # once found, store the index so we can use it to take extract the specific 
+    # cell data we want from each row
+    for my $header_line (@column_names) {
+        # last if is like break in c++
+        # once condition is met, break out, else increment extract_col
+        last if $header_line =~ m/$wanted_column/;
+        $extract_col++;
+    }
+
+    # iterates between rows
+    while ( my $row = <IN> ) {
+        # last unless $row =~ /\S/;
+        # chomp $row;
+        @cells = split( ",", $row );
+        # print($row."\n");
+        # print(@cells."\n");
+        my ($yyyy, $mm, $dd) = split('-', $cells[$extract_col]);
+        push( @colvalues, $mm);
+        $rowLength++;
+    }
+
+    # this will ether increment an already existing key-value with +1
+    # or it will insert a new key-value pair into the hash making it set to 1
+    foreach my $month(@colvalues) {
+        $lowestMonthTable{$month} += 1;
+    }
+    my $lowMarker = 100000000000;
+    my $lowKey = 0;
+    # display the key and the value associated with that key
+    foreach my $key(sort{ $lowestMonthTable{$b} <=> $lowestMonthTable{$a} } keys %lowestMonthTable){
+        if($lowMarker > $lowestMonthTable{$key}){
+            $lowMarker = $lowestMonthTable{$key};
+            $lowKey = $key
+        }
+    }
+    print "LOWEST month: $lowKey, Collision Count: " . $lowestMonthTable{$lowKey} . "\n";
+
+    my $sizeofarray = scalar @colvalues;
+    print "$rowLength Records Scanned\n";
+    print "$sizeofarray Records Matches\n";
+}
+
+sub LowestCollisionByFactorVH1 {
+    open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
+    my $wanted_column = "CONTRIBUTING FACTOR VEHICLE 1";
+    my $rowLength;
+    # array
+    my @cells;
+    my @colvalues;
+    # Hash table
+    my %lowestCollisionVH1Table = ();
+
+    # represents the first row of the file
+    my $header = <IN>;
+    # splits each column in header and stores it in an array
+    my @column_names = split( ",", $header );
+    my $extract_col = 0;
+
+    # iterates through column_names and matches the wanted column
+    # once found, store the index so we can use it to take extract the specific 
+    # cell data we want from each row
+    for my $header_line (@column_names) {
+        # last if is like break in c++
+        # once condition is met, break out, else increment extract_col
+        last if $header_line =~ m/$wanted_column/;
+        $extract_col++;
+    }
+
+    # iterates between rows
+    while ( my $row = <IN> ) {
+        # last unless $row =~ /\S/;
+        # chomp $row;
+        @cells = split( ",", $row );
+        # print($row."\n");
+        # print(@cells."\n");
+        push( @colvalues, $cells[$extract_col]);
+        $rowLength++;
+    }
+
+    # this will ether increment an already existing key-value with +1
+    # or it will insert a new key-value pair into the hash making it set to 1
+    foreach my $ContributingFactor(@colvalues){
+        if($ContributingFactor eq ""){
+            $ContributingFactor = "Unspecified";
+        }
+        $lowestCollisionVH1Table{$ContributingFactor} += 1;
+    }
+
+    my $lowestCollisionMarker = 100000000000;
+    my $lowestCollisionKey = 0;
+    # display the key and the value associated with that key
+    foreach my $key(sort{ $lowestCollisionVH1Table{$b} <=> $lowestCollisionVH1Table{$a} } keys %lowestCollisionVH1Table){
+        if($lowestCollisionMarker > $lowestCollisionVH1Table{$key}){
+            $lowestCollisionMarker = $lowestCollisionVH1Table{$key};
+            $lowestCollisionKey = $key
+        }
+    }
+    print "CONTRIBUTING FACTOR VEHICLE 1: $lowestCollisionKey, Collision Count: " . $lowestCollisionVH1Table{$lowestCollisionKey} . "\n";
+
+    my $sizeofarray = scalar @colvalues;
+    print "$rowLength Records Scanned\n";
+    print "$sizeofarray Records Matches\n";
+}
+
+sub HighestCollisionByFactorVH1 {
+    open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
+    my $wanted_column = "CONTRIBUTING FACTOR VEHICLE 1";
+    my $rowLength;
+    # array
+    my @cells;
+    my @colvalues;
+    # Hash table
+    my %highestCollisionVH1Table = ();
+
+    # represents the first row of the file
+    my $header = <IN>;
+    # splits each column in header and stores it in an array
+    my @column_names = split( ",", $header );
+    my $extract_col = 0;
+
+    # iterates through column_names and matches the wanted column
+    # once found, store the index so we can use it to take extract the specific 
+    # cell data we want from each row
+    for my $header_line (@column_names) {
+        # last if is like break in c++
+        # once condition is met, break out, else increment extract_col
+        last if $header_line =~ m/$wanted_column/;
+        $extract_col++;
+    }
+
+    # iterates between rows
+    while ( my $row = <IN> ) {
+        # last unless $row =~ /\S/;
+        # chomp $row;
+        @cells = split( ",", $row );
+        # print($row."\n");
+        # print(@cells."\n");
+        push( @colvalues, $cells[$extract_col]);
+        $rowLength++;
+    }
+
+    # this will ether increment an already existing key-value with +1
+    # or it will insert a new key-value pair into the hash making it set to 1
+    foreach my $ContributingFactor(@colvalues){
+        if($ContributingFactor eq ""){
+            $ContributingFactor = "Unspecified";
+        }
+        $highestCollisionVH1Table{$ContributingFactor} += 1;
+    }
+
+    my $highestCollisionMarker = 0;
+    my $highestCollisionKey = 0;
+    # display the key and the value associated with that key
+    foreach my $key(sort{ $highestCollisionVH1Table{$b} <=> $highestCollisionVH1Table{$a} } keys %highestCollisionVH1Table){
+        if($highestCollisionMarker < $highestCollisionVH1Table{$key}){
+            $highestCollisionMarker = $highestCollisionVH1Table{$key};
+            $highestCollisionKey = $key
+        }
+    }
+    print "CONTRIBUTING FACTOR VEHICLE 1: $highestCollisionKey, Collision Count: " . $highestCollisionVH1Table{$highestCollisionKey} . "\n";
+
+    my $sizeofarray = scalar @colvalues;
+    print "$rowLength Records Scanned\n";
+    print "$sizeofarray Records Matches\n";
+}
+
+sub CollisionByYearUserChoice {
     open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
     my $wanted_column = "ACCIDENT DATE";
     my @cells;
@@ -412,7 +713,7 @@ sub subroutines12 {
     print "$sizeofarray Records Matches\n";
 }
 
-sub subroutines13 {
+sub CollisionByBoroughUserChoice {
     open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
     my $wanted_column = "BOROUGH";
     my @cells;
@@ -537,24 +838,73 @@ while($same_answer ne "x"){
             $same_answer = <STDIN>;
             chomp $same_answer;            
             }
-
+        when ("7"){
+            print color('white');
+            print("Please enter a number corresponding to the option you want to choose: ");
+            $same_answer = <STDIN>;
+            chomp $same_answer;            
+            }
+        when ("8"){
+            print color('bold blue');
+            print("Please enter a number corresponding to the option you want to choose: ");
+            $same_answer = <STDIN>;
+            chomp $same_answer;            
+            }
+        when ("9"){
+            print color('bold red');
+            LowestCollisionYear();
+            print("Please enter a number corresponding to the option you want to choose: ");
+            $same_answer = <STDIN>;
+            chomp $same_answer;            
+            }
+        when ("10"){
+            print color('bold green');
+            LowestCollisionMonth();
+            print("Please enter a number corresponding to the option you want to choose: ");
+            $same_answer = <STDIN>;
+            chomp $same_answer;            
+            }
+        when ("11")  { 
+                print color('bold yellow');
+                LowestCollisionByFactorVH1();
+                print("Please enter a number corresponding to the option you want to choose: ");
+                $same_answer = <STDIN>;
+                chomp $same_answer;  
+                }
         when ("12")  { 
+                print color('bold cyan');
+                HighestCollisionByFactorVH1();
+                print("Please enter a number corresponding to the option you want to choose: ");
+                $same_answer = <STDIN>;
+                chomp $same_answer;  
+                }
+        when ("13")  { 
+                print color('bright_blue');
                 print "Pick a year to display collisions for\n";
                 my $Year = <STDIN>;
                 chomp $Year;
-                subroutines12($Year);
+                CollisionByYearUserChoice($Year);
+                print("Please enter a number corresponding to the option you want to choose: ");
+                $same_answer = <STDIN>;
+                chomp $same_answer;
                 }
-        when ("13")   {         
-                print "Pick a year to display collisions for\n";
+        when ("14")   {         
+                print color('bold magenta');
+                print "Pick a borough to display collisions for\n";
                 my $Borough = <STDIN>;
                 chomp $Borough;
                 if(uc $Borough eq "QUEENS" || "MANHATTAN" || "BROOKLYN" || "STATEN ISLAND" || "BRONX"){
                     $Borough = uc $Borough;
-                    subroutines13($Borough);
+                    CollisionByBoroughUserChoice($Borough);
                 }else{
                         print "That is not one of the 5 Boroughs"
                 }
+                print("Please enter a number corresponding to the option you want to choose: ");
+                $same_answer = <STDIN>;
+                chomp $same_answer;
             }
+
+
         default { print 'Pick a valid entry';}   
     }
 }
