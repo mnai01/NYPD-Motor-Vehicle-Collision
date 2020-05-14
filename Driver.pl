@@ -591,7 +591,7 @@ sub LowestCollisionByFactorVH1 {
             $lowestCollisionKey = $key
         }
     }
-    print "CONTRIBUTING FACTOR VEHICLE 1: $lowestCollisionKey, Collision Count: " . $lowestCollisionVH1Table{$lowestCollisionKey} . "\n";
+    print "LOWEST CONTRIBUTING FACTOR VEHICLE 1: $lowestCollisionKey, Collision Count: " . $lowestCollisionVH1Table{$lowestCollisionKey} . "\n";
 
     my $sizeofarray = scalar @colvalues;
     print "$rowLength Records Scanned\n";
@@ -653,7 +653,7 @@ sub HighestCollisionByFactorVH1 {
             $highestCollisionKey = $key
         }
     }
-    print "CONTRIBUTING FACTOR VEHICLE 1: $highestCollisionKey, Collision Count: " . $highestCollisionVH1Table{$highestCollisionKey} . "\n";
+    print "HIGHEST CONTRIBUTING FACTOR VEHICLE 1: $highestCollisionKey, Collision Count: " . $highestCollisionVH1Table{$highestCollisionKey} . "\n";
 
     my $sizeofarray = scalar @colvalues;
     print "$rowLength Records Scanned\n";
@@ -765,10 +765,63 @@ sub CollisionByBoroughUserChoice {
     print "$sizeofarray Records Matches\n";
 }
 
+sub CollisionCyclistKilled {
+    open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
+    my $wanted_column = "NUMBER OF CYCLIST INJURED";
+    my $rowLength;
+    # array
+    my @cells;
+    my @colvalues;
+    # Hash table
+    my %injuredCyclistTable = ();
 
-# foreach my $element (@colvalues) {
-#     print "$element\n";
-# }
+    # represents the first row of the file
+    my $header = <IN>;
+    # splits each column in header and stores it in an array
+    my @column_names = split( ",", $header );
+    my $extract_col = 0;
+
+    # iterates through column_names and matches the wanted column
+    # once found, store the index so we can use it to take extract the specific 
+    # cell data we want from each row
+    for my $header_line (@column_names) {
+        # last if is like break in c++
+        # once condition is met, break out, else increment extract_col
+        last if $header_line =~ m/$wanted_column/;
+        $extract_col++;
+    }
+
+    # iterates between rows
+    while ( my $row = <IN> ) {
+        # last unless $row =~ /\S/;
+        # chomp $row;
+        @cells = split( ",", $row );
+        # print($row."\n");
+        # print(@cells."\n");
+        push( @colvalues, $cells[$extract_col]);
+        $rowLength++;
+    }
+
+    # this will ether increment an already existing key-value with +1
+    # or it will insert a new key-value pair into the hash making it set to 1
+    foreach my $injuredCyclist(@colvalues) {
+        chomp $injuredCyclist;
+        # removed records that say "Unspecified" or are blank
+        if($injuredCyclist ne "Unspecified" && $injuredCyclist ne ""){
+            $injuredCyclistTable{$injuredCyclist} += 1;
+        }
+    }
+
+    # display the key and the value associated with that key
+    foreach my $key(sort{ $injuredCyclistTable{$b} <=> $injuredCyclistTable{$a} } keys %injuredCyclistTable){
+        print "Amount of cyclists injured: $key, Collision Count: " . $injuredCyclistTable{$key} . "\n";
+    }
+
+    my $sizeofarray = scalar @colvalues;
+    print "$rowLength Records Scanned\n";
+    print "$sizeofarray Records Matches\n";
+}
+
 
 my $answer = $prompt->menu(
       1  =>      ["Collisions by Year", 1],
@@ -777,17 +830,13 @@ my $answer = $prompt->menu(
       4  =>      ["Collisions by factor (vehicle #2) - write code to eliminate “unspecified” or blank.", 4],
       5  =>      ["Collisions by zip code", 5],
       6  =>      ["Collisions by season (do more occur in the winter vs. the summer?)", 6],
-      7  =>      ["Contributing factor by month sorted", 7],
-      8  =>      ["Contributing factor by year sorted", 8],
-      9  =>      ["Lowest year for collisions", 9],
-      10  =>     ["Lowest day for collisions - Same instructions as highest day", 10],
-      11  =>     ["Lowest contributing factor for vehicle #1", 11],
-      12  =>     ["Collisions by year (user enters the year)", 12],
-      13  =>     ["Collisions by zip (user enters the zip)", 13],
-      14  =>     ["Collisions where a cyclist was injured", 14],
-      15  =>     ["Collisions where nobody was injured", 15],
-      16  =>     ["Accident with the largest number of people injured", 16],
-      17  =>     ["Accidents where more than 5 people were injured", 17],
+      7  =>      ["Lowest year for collisions", 7],
+      8  =>     ["Lowest day for collisions - Same instructions as highest day", 8],
+      9  =>     ["Lowest contributing factor for vehicle #1", 9],
+      10  =>     ["Collisions by year (user enters the year)", 10],
+      11  =>     ["Collisions by zip (user enters the zip)", 11],
+      12  =>     ["Collision by borough (user enters the zip)", 12],
+      13  =>     ["Collisions where a cyclist was injured", 13],
 
 );
 
@@ -839,48 +888,36 @@ while($same_answer ne "x"){
             chomp $same_answer;            
             }
         when ("7"){
-            print color('white');
-            print("Please enter a number corresponding to the option you want to choose: ");
-            $same_answer = <STDIN>;
-            chomp $same_answer;            
-            }
-        when ("8"){
-            print color('bold blue');
-            print("Please enter a number corresponding to the option you want to choose: ");
-            $same_answer = <STDIN>;
-            chomp $same_answer;            
-            }
-        when ("9"){
             print color('bold red');
             LowestCollisionYear();
             print("Please enter a number corresponding to the option you want to choose: ");
             $same_answer = <STDIN>;
             chomp $same_answer;            
             }
-        when ("10"){
+        when ("8"){
             print color('bold green');
             LowestCollisionMonth();
             print("Please enter a number corresponding to the option you want to choose: ");
             $same_answer = <STDIN>;
             chomp $same_answer;            
             }
-        when ("11")  { 
+        when ("9")  { 
                 print color('bold yellow');
                 LowestCollisionByFactorVH1();
                 print("Please enter a number corresponding to the option you want to choose: ");
                 $same_answer = <STDIN>;
                 chomp $same_answer;  
                 }
-        when ("12")  { 
+        when ("10")  { 
                 print color('bold cyan');
                 HighestCollisionByFactorVH1();
                 print("Please enter a number corresponding to the option you want to choose: ");
                 $same_answer = <STDIN>;
                 chomp $same_answer;  
                 }
-        when ("13")  { 
-                print color('bright_blue');
-                print "Pick a year to display collisions for\n";
+        when ("11")  { 
+                print color('bold magenta');
+                print "Pick a year to display collisions for (May take a minute to load)\n";
                 my $Year = <STDIN>;
                 chomp $Year;
                 CollisionByYearUserChoice($Year);
@@ -888,9 +925,9 @@ while($same_answer ne "x"){
                 $same_answer = <STDIN>;
                 chomp $same_answer;
                 }
-        when ("14")   {         
-                print color('bold magenta');
-                print "Pick a borough to display collisions for\n";
+        when ("12")   {         
+                print color('bright_blue');
+                print "Pick a borough to display collisions for (May take a minute to load)\n";
                 my $Borough = <STDIN>;
                 chomp $Borough;
                 if(uc $Borough eq "QUEENS" || "MANHATTAN" || "BROOKLYN" || "STATEN ISLAND" || "BRONX"){
@@ -903,34 +940,16 @@ while($same_answer ne "x"){
                 $same_answer = <STDIN>;
                 chomp $same_answer;
             }
+        when ("13")   {         
+                print color('bright_blue');
+                CollisionCyclistKilled();
+                print("Please enter a number corresponding to the option you want to choose: ");
+                $same_answer = <STDIN>;
+                chomp $same_answer;
+            }
 
-
-        default { print 'Pick a valid entry';}   
+        default { print 'Pick a valid entry: ';
+                $same_answer = <STDIN>;
+                chomp $same_answer;}   
     }
 }
-
-# open( IN, "nypd-motor-vehicle-collisions_RB.csv" ) or die("Unable to open file");
-# my $wanted_column = "BOROUGH";
-# my @cells;
-# my @colvalues;
-
-# my $header = <IN>;
-# my @column_names = split( ",", $header );
-# my $extract_col = 0;
-
-# for my $header_line (@column_names) {
-#     last if $header_line =~ m/$wanted_column/;
-#     $extract_col++;
-# }
-# while ( my $row = <IN> ) {
-#     last unless $row =~ /\S/;
-#     chomp $row;
-#     @cells = split( ",", $row );
-#     push( @colvalues, $cells[$extract_col] );
-# }
-# my $sizeofarray = scalar @colvalues;
-# print "Size of the coulmn= $sizeofarray";
-
-# foreach my $element (@colvalues) {
-#     print "$element\n";
-# }
