@@ -841,8 +841,8 @@ my $answer = $prompt->menu(
       8  =>      ["Lowest month for collisions", 8],
       9  =>      ["Lowest contributing factor for vehicle #1", 9],
       10  =>     ["Highest contributing factor for vehicle #1", 10],
-      11  =>     ["Collisions by year (user enters the zip)", 11],
-      12  =>     ["Collision by borough (user enters the zip)", 12],
+      11  =>     ["Collisions by year (user enters the year)", 11],
+      12  =>     ["Collision by borough (user enters the borough)", 12],
       13  =>     ["Collisions where a cyclist was injured", 13],
 
 );
