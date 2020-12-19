@@ -697,7 +697,9 @@ sub CollisionByYearUserChoice {
         if($_[0] eq $yyyy){
             push( @colvalues, $cells[$extract_col]);
             print("\n////////////New Record////////////\n");
+            # Creates an array of sequestional numbers from 0 to 17 because there are 17 columns. 
             my @a = (0..17);
+            # for loop that runs through 0 to 17
             for(@a){
                 # added condition so if its blank just fill it with Unspecified
                 if($cells[$_] eq ""){
@@ -749,7 +751,9 @@ sub CollisionByBoroughUserChoice {
         if($_[0] eq $cells[$extract_col]){
             push( @colvalues, $cells[$extract_col]);
             print("\n////////////New Record////////////\n");
+            # Creates an array of sequestional numbers from 0 to 17 because there are 17 columns. 
             my @a = (0..17);
+            # for loop that runs through 0 to 17
             for(@a){
                 # added condition so if its blank just fill it with Unspecified
                 if($cells[$_] eq ""){
@@ -834,10 +838,10 @@ my $answer = $prompt->menu(
       5  =>      ["Collisions by zip code", 5],
       6  =>      ["Collisions by season (do more occur in the winter vs. the summer?)", 6],
       7  =>      ["Lowest year for collisions", 7],
-      8  =>     ["Lowest day for collisions - Same instructions as highest day", 8],
-      9  =>     ["Lowest contributing factor for vehicle #1", 9],
-      10  =>     ["Collisions by year (user enters the year)", 10],
-      11  =>     ["Collisions by zip (user enters the zip)", 11],
+      8  =>      ["Lowest month for collisions", 8],
+      9  =>      ["Lowest contributing factor for vehicle #1", 9],
+      10  =>     ["Highest contributing factor for vehicle #1", 10],
+      11  =>     ["Collisions by year (user enters the zip)", 11],
       12  =>     ["Collision by borough (user enters the zip)", 12],
       13  =>     ["Collisions where a cyclist was injured", 13],
 
